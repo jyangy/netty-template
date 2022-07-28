@@ -1,6 +1,7 @@
 package org.example.netty.template.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -24,7 +25,7 @@ public class Server {
 
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    private static final int PORT = 8899;
+    private static final int PORT = 8888;
 
     private EventLoopGroup boss;
     private EventLoopGroup worker;
@@ -42,14 +43,13 @@ public class Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(new SplitHandler());
-                        socketChannel.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+                        socketChannel.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
                             @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                                super.channelRead(ctx, msg);
+                            protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
                             }
                         });
-                                socketChannel.pipeline().addLast(PacketCodecHandler.INSTANCE);
+                        socketChannel.pipeline().addLast(new SplitHandler());
+                        socketChannel.pipeline().addLast(PacketCodecHandler.INSTANCE);
                         socketChannel.pipeline().addLast(PingHandler.INSTANCE);
                     }
                 });
@@ -72,6 +72,7 @@ public class Server {
     public static void main(String[] args) {
         Server server = new Server();
         server.start();
+        //System.getProperties().list(System.out);
     }
 
 }

@@ -12,6 +12,7 @@
         <module>client</module>
         <module>server</module>
         <module>protocol</module>
+        <module>http</module>
     </modules>
 
     <properties>
